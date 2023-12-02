@@ -1,0 +1,27 @@
+.sidebar {
+    height: 100%;
+    width: 350px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 15px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    padding: 30px;
+    overflow-y: scroll;
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.undoRedo {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}

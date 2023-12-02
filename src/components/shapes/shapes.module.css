@@ -1,0 +1,11 @@
+.shapes {
+  display: flex;
+  flex-direction: column;
+}
+.button {
+  text-align: start !important;
+}
+.activeButton {
+  text-align: start;
+  color: gold !important;
+}
