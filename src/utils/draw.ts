@@ -1,7 +1,7 @@
-import { MouseEvent } from "react";
 import { signal } from "@preact/signals-react";
+import { MouseEvent, TouchEvent } from "react";
 
-import {size} from "../components/size/size";
+import { size } from "../components/size/size";
 import { fill } from "../components/fill/fill";
 import { color } from "../components/colors/colors";
 import { selectedTool } from "../components/tools/tools";
@@ -12,8 +12,8 @@ const past = signal<ImageData[][]>([]);
 const present = signal<ImageData[]>([]);
 const future = signal<ImageData[][]>([]);
 
-export function startPainting(event: MouseEvent) {
-  const { offsetX, offsetY } = event.nativeEvent;
+export function startPainting(event: MouseEvent | TouchEvent) {
+  const { offsetX, offsetY } = getOffset(event);
   ctx.value!.beginPath();
   ctx.value!.moveTo(offsetX, offsetY);
   isPainting.value = true;
@@ -36,11 +36,13 @@ export function stopPainting() {
   );
 }
 
-export function draw(event: MouseEvent) {
+export function draw(event: MouseEvent | TouchEvent) {
   if (!isPainting.value) return;
   ctx.value!.putImageData(snapshot.value!, 0, 0);
+
+  const { offsetX, offsetY } = getOffset(event);
+
   if (selectedTool.value === "Eraser") {
-    const { offsetX, offsetY } = event.nativeEvent;
     ctx.value!.lineCap = "square";
     ctx.value!.strokeStyle = "white";
     ctx.value?.lineTo(offsetX, offsetY);
@@ -50,44 +52,35 @@ export function draw(event: MouseEvent) {
     ctx.value!.strokeStyle = color.value;
     ctx.value!.lineCap = "round";
     if (selectedTool.value === "Brush") {
-      const { offsetX, offsetY } = event.nativeEvent;
       ctx.value?.lineTo(offsetX, offsetY);
       ctx.value?.stroke();
     } else {
       ctx.value?.beginPath();
       switch (selectedTool.value) {
         case "Line":
-          drawLine(event);
+          drawLine(offsetX, offsetY);
           break;
-
         case "Circle":
-          drawCircle(event);
+          drawCircle(offsetX, offsetY);
           break;
-
         case "Triangle":
-          drawRegular(event, 3);
+          drawRegular(offsetX, offsetY, 3);
           break;
-
         case "Rectangle":
-          drawRec(event);
+          drawRec(offsetX, offsetY);
           break;
-
         case "Square":
-          drawRegular(event, 4);
+          drawRegular(offsetX, offsetY, 4);
           break;
-
         case "Pentagon":
-          drawRegular(event, 5);
+          drawRegular(offsetX, offsetY, 5);
           break;
-
         case "Hexagon":
-          drawRegular(event, 6);
+          drawRegular(offsetX, offsetY, 6);
           break;
-
         case "Heptagon":
-          drawRegular(event, 7);
+          drawRegular(offsetX, offsetY, 7);
           break;
-
         default:
           break;
       }
@@ -95,18 +88,30 @@ export function draw(event: MouseEvent) {
   }
 }
 
-function drawLine(event: MouseEvent) {
-  const { offsetX, offsetY } = event.nativeEvent;
+function getOffset(event: any) {
+  let offsetX = 0,
+    offsetY = 0;
+  if (event.type === "mousedown"||event.type ==="mousemove") {
+    offsetX = event.nativeEvent.offsetX;
+    offsetY = event.nativeEvent.offsetY;
+  } else {
+    const touch = event.touches[0];
+    const target = event.target;
 
+    offsetX = touch.clientX - target.offsetLeft;
+    offsetY = touch.clientY - target.offsetTop;
+  }
+  return { offsetX, offsetY };
+}
+
+function drawLine(offsetX: number, offsetY: number) {
   ctx.value!.moveTo(startPos.value.x, startPos.value.y);
   ctx.value!.lineTo(offsetX, offsetY);
 
   ctx.value!.stroke();
 }
 
-function drawCircle(event: MouseEvent) {
-  const { offsetX, offsetY } = event.nativeEvent;
-
+function drawCircle(offsetX: number, offsetY: number) {
   let radius = Math.sqrt(
     Math.pow(startPos.value.x - offsetX, 2) +
       Math.pow(startPos.value.y - offsetY, 2)
@@ -120,9 +125,7 @@ function drawCircle(event: MouseEvent) {
   ctx.value?.stroke();
 }
 
-function drawRegular(event: MouseEvent, sides: number) {
-  const { offsetX, offsetY } = event.nativeEvent;
-
+function drawRegular(offsetX: number, offsetY: number, sides: number) {
   let radius = Math.sqrt(
     Math.pow(startPos.value.x - offsetX, 2) +
       Math.pow(startPos.value.y - offsetY, 2)
@@ -142,8 +145,7 @@ function drawRegular(event: MouseEvent, sides: number) {
   ctx.value?.stroke();
 }
 
-function drawRec(event: MouseEvent) {
-  const { offsetX, offsetY } = event.nativeEvent;
+function drawRec(offsetX: number, offsetY: number) {
   ctx.value!.rect(
     startPos.value.x,
     startPos.value.y,

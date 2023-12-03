@@ -24,6 +24,9 @@
 .home h3{
     margin: 0 !important;
 }
+.home img{
+    max-width: 100%;
+}
 .button{
     padding: 10px 20px;
     text-decoration: none;
@@ -33,4 +36,14 @@
 }
 .button:hover{
     background-color: #ffcb2f;
+}
+@media (max-width:1300px) {
+    .home{
+        flex-direction: column;
+        
+    }
+    .home div{
+        align-items: center;
+        justify-content: center;
+    }
 }

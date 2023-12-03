@@ -31,15 +31,19 @@ const Canvas = () => {
   }, []);
 
   return (
-    <motion.div ref={constraintsRef} className={styles.container}>
+    <motion.div ref={constraintsRef} className={styles.container} >
       <motion.canvas
         ref={canvasRef}
         drag={selectedTool.value === "Drag"}
         dragConstraints={constraintsRef}
         onMouseDown={(event) => startPainting(event)}
+        onTouchStart={(event) => startPainting(event)}
         onMouseUp={() => stopPainting()}
+        onTouchEnd={() => stopPainting()}
         onMouseMove={(event) => draw(event)}
+        onTouchMove={(event) => draw(event)}
         onMouseOut={() => stopPainting()}
+        onTouchCancel={() => stopPainting()}
         className={styles.canvas}
         style={
           selectedTool.value === "Drag"
