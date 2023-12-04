@@ -91,15 +91,20 @@ export function draw(event: MouseEvent | TouchEvent) {
 function getOffset(event: any) {
   let offsetX = 0,
     offsetY = 0;
-  if (event.type === "mousedown"||event.type ==="mousemove") {
+  if (event.type[0] === "m") {
     offsetX = event.nativeEvent.offsetX;
     offsetY = event.nativeEvent.offsetY;
-  } else {
+  } else if (event.type[0] === "t") {
     const touch = event.touches[0];
     const target = event.target;
 
     offsetX = touch.clientX - target.offsetLeft;
     offsetY = touch.clientY - target.offsetTop;
+  } else if (event.type[0] === "p") {
+    const target = event.target;
+
+    offsetX = event.clientX - target.offsetLeft;
+    offsetY = event.clientY - target.offsetTop;
   }
   return { offsetX, offsetY };
 }
